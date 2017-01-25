@@ -14,5 +14,13 @@ export default StyleSheet.create({
   formLabel: {
     fontWeight: 'bold',
     fontSize: 15
+  },
+  formSubmit: {
+    alignSelf: 'center',
+    borderColor: 'black',
+    fontWeight: 'bold',
+    fontSize: 15,
+    margin: 5,
+    padding: 5
   }
 });
