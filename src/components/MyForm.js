@@ -2,7 +2,7 @@ import React from 'react';
 import { reduxForm, Field } from 'redux-form';
 import { ScrollView, Text, TouchableOpacity } from 'react-native';
 
-import MyTextInput from './MyTextInput'
+import MyTextInput from './MyTextInput';
 import styles from './MyForm.styles';
 
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
@@ -37,4 +37,21 @@ function MyForm(props) {
 }
 
 
-export default reduxForm({ form: 'signIn' })(MyForm);
+export default reduxForm({
+  form: 'signIn',
+  asyncValidate: (values) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => { // simulate request
+        if (values.email.indexOf('@wolox') === -1) {
+          reject({ email: 'Only mails at wolox are allowed' });
+        } else {
+          resolve();
+        }
+      }, 1000);
+    });
+  },
+  asyncBlurFields: ['email'],
+  shouldAsyncValidate: (params) => {
+    return params.trigger === 'blur' && params.syncValidationPasses; // do not async validate on submit
+  }
+})(MyForm);
