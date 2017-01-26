@@ -5,6 +5,8 @@ import { ScrollView, Text, TouchableOpacity } from 'react-native';
 import MyTextInput from './MyTextInput'
 import styles from './MyForm.styles';
 
+const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
+
 function MyForm(props) {
   return (
     <ScrollView style={styles.container} keyboardShouldPersistTaps={'handled'}>
@@ -12,12 +14,20 @@ function MyForm(props) {
         name={'email'}
         component={MyTextInput}
         placeholder={'Email'}
+        validate={[
+          (val) => val ? undefined : 'Email field is required',
+          (val) => emailRegex.test(val) ? undefined : 'Email format is invalid'
+        ]}
       />
       <Field
         name={'password'}
         component={MyTextInput}
         placeholder={'Password'}
         secureTextEntry
+        validate={[
+          (val) => val ? undefined : 'Password field is required',
+          (val) => val && val.length >= 8 ? undefined : 'Password must be at least 8 characters long'
+        ]}
       />
       <TouchableOpacity onPress={props.handleSubmit}>
         <Text style={styles.formSubmit}>Submit!</Text>
@@ -26,24 +36,5 @@ function MyForm(props) {
   );
 }
 
-const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
 
-export default reduxForm({
-  form: 'signIn',
-  validate: (values) => {
-    const errors = {};
-    errors.email = !values.email
-      ? 'Email field is required'
-      : !emailRegex.test(values.email)
-      ? 'Email format is invalid'
-      : undefined;
-
-    errors.password = !values.password
-      ? 'Password field is required'
-      : values.password.length < 8
-      ? 'Password must be at least 8 characters long'
-      : undefined;
-
-    return errors;
-  }
-})(MyForm);
+export default reduxForm({ form: 'signIn' })(MyForm);
