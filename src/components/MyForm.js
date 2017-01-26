@@ -5,29 +5,22 @@ import { ScrollView, Text, TouchableOpacity } from 'react-native';
 import MyTextInput from './MyTextInput';
 import styles from './MyForm.styles';
 
-const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
+const phoneFormatter = (number) => {
+  if (!number) return '';
+  // NNN-NNN-NNNN
+  const splitter = /.{1,3}/g;
+  number = number.replace(/-/g, '').substring(0, 10);
+  return number.toString().substring(0, 7).match(splitter).join('-') + number.substring(7);
+};
 
 function MyForm(props) {
   return (
     <ScrollView style={styles.container} keyboardShouldPersistTaps={'handled'}>
       <Field
-        name={'email'}
+        name={'phone_number'}
         component={MyTextInput}
-        placeholder={'Email'}
-        validate={[
-          (val) => val ? undefined : 'Email field is required',
-          (val) => emailRegex.test(val) ? undefined : 'Email format is invalid'
-        ]}
-      />
-      <Field
-        name={'password'}
-        component={MyTextInput}
-        placeholder={'Password'}
-        secureTextEntry
-        validate={[
-          (val) => val ? undefined : 'Password field is required',
-          (val) => val && val.length >= 8 ? undefined : 'Password must be at least 8 characters long'
-        ]}
+        placeholder={'Phone (NNN-NNN-NNNN)'}
+        format={phoneFormatter}
       />
       <TouchableOpacity onPress={props.handleSubmit}>
         <Text style={styles.formSubmit}>Submit!</Text>
@@ -38,20 +31,5 @@ function MyForm(props) {
 
 
 export default reduxForm({
-  form: 'signIn',
-  asyncValidate: (values) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => { // simulate request
-        if (values.email.indexOf('@wolox') === -1) {
-          reject({ email: 'Only mails at wolox are allowed' });
-        } else {
-          resolve();
-        }
-      }, 1000);
-    });
-  },
-  asyncBlurFields: ['email'],
-  shouldAsyncValidate: (params) => {
-    return params.trigger === 'blur' && params.syncValidationPasses; // do not async validate on submit
-  }
+  form: 'signIn'
 })(MyForm);
