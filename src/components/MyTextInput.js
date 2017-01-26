@@ -1,30 +1,29 @@
 import React from 'react';
 import { TextInput, View, Text } from 'react-native';
 
+import styles from './MyTextInput.styles';
+
 /**
  * to be wrapped with redux-form Field component
  */
 export default function MyTextInput(props) {
   const { input, meta, ...inputProps } = props;
 
-  const formStates = ['active', 'autofilled', 'asyncValidating', 'dirty', 'invalid', 'pristine',
-    'submitting', 'touched', 'valid', 'visited'];
+  // do not display warning if the field has not been touched or if it's currently being edited
+  const validationStyles = meta.touched && !meta.active
+    ? meta.valid ? styles.valid : styles.invalid
+    : null;
 
   return (
-    <View>
+    <View style={[styles.inputContainer, validationStyles]}>
       <TextInput
         {...inputProps}
         onChangeText={input.onChange}
         onBlur={input.onBlur}
         onFocus={input.onFocus}
         value={input.value}
+        style={styles.input}
       />
-      <Text> The { input.name} input is:</Text>
-      {
-        formStates.filter((state) => meta[state]).map((state) => {
-          return <Text key={state} style={{ fontWeight: 'bold'}}> - { state }</Text>;
-        })
-      }
     </View>
   );
 }
